@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Biblioteca</title>
+    <style>
+        body {
+
+            background: linear-gradient(to bottom, #240046, #05000a);
+
+            /* Garante que o fundo cubra a tela toda e fique fixo ao rolar */
+            min-height: 100vh;
+            background-attachment: fixed;
+
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Títulos com sombra leve para destacar do roxo */
+        h1 { text-align: center; color: #efe9e7; margin-bottom: 40px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        h2 { border-bottom: 2px solid #9d4edd; padding-bottom: 10px; color: #c77dff; }
+
+        /* Cards de Livros - Um pouco transparentes para fundir com o fundo */
+        .grid-livros { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+
+        .card {
+            background-color: rgba(30, 30, 30, 0.9); /* O 0.9 deixa levemente transparente */
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            border: 1px solid #3c096c; /* Borda roxa sutil */
+        }
+        .card:hover { transform: translateY(-5px); border-color: #7b2cbf; }
+
+        .card h3 { margin: 0 0 10px 0; color: #fff; }
+        .card p { margin: 5px 0; color: #b0b0b0; font-size: 0.9em; }
+
+        /* Etiquetas */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
+        .badge-lido { background-color: #2e7d32; color: white; }
+        .badge-lendo { background-color: #ff9100; color: black; }
+        .badge-quero { background-color: #3a0ca3; color: white; }
+
+        .stars { color: #ffd700; letter-spacing: 2px; }
+
+        /* Formulário */
+        .form-box {
+            background-color: rgba(44, 44, 44, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border: 1px solid #5a189a;
+        }
+
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #121212; border: 1px solid #5a189a; color: white; border-radius: 4px; box-sizing: border-box; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #e0aaff; }
+
+        button { width: 100%; padding: 12px; background-color: #7b2cbf; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; transition: 0.3s; }
+        button:hover { background-color: #9d4edd; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📚 Biblioteca do Luiz</h1>
+
+    <h2>📖 Minha Estante</h2>
+    <div id="estante" class="grid-livros">
+    </div>
+
+</div>
+
+</div>
+
+<hr style="border-color: #7b2cbf; margin: 50px 0; opacity: 0.3;">
+
+<div class="form-box" style="border-color: #03dac6;">
+    <h2 style="color: #03dac6; border-color: #018786;">💡 Indique um Livro para mim</h2>
+    <p style="color: #ccc; font-size: 0.9em;">Não precisa de login! É só escrever e enviar.</p>
+
+    <input type="text" id="nomeAmigo" placeholder="Seu Nome (Visitante)">
+    <input type="text" id="nomeLivroInd" placeholder="Nome do Livro">
+    <textarea id="motivo" placeholder="Por que eu devo ler este livro?" rows="2"></textarea>
+
+    <button onclick="enviarIndicacao()" style="background-color: #03dac6; color: black;">Enviar Sugestão</button>
+</div>
+
+<h2 style="color: #03dac6; border-color: #03dac6;">💬 Mural dos Amigos</h2>
+<div id="mural" class="grid-livros">
+</div>
+
+
+<script>
+    const API = 'http://localhost:8080/livros';
+
+    carregarLivros();
+
+    function carregarLivros() {
+        fetch(API)
+            .then(res => res.json())
+            .then(livros => {
+                const div = document.getElementById('estante');
+                div.innerHTML = ''; // Limpa
+
+                livros.forEach(livro => {
+                    // Lógica das cores (Badges)
+                    let classeBadge = 'badge-quero';
+                    let textoStatus = 'Quero Ler';
+
+                    if(livro.status === 'LIDO') { classeBadge = 'badge-lido'; textoStatus = 'Lido'; }
+                    if(livro.status === 'LENDO') { classeBadge = 'badge-lendo'; textoStatus = 'Lendo'; }
+
+                    // Lógica das Estrelas
+                    let estrelas = '';
+                    if(livro.nota) {
+                        estrelas = '★'.repeat(livro.nota) + '☆'.repeat(5 - livro.nota);
+                    }
+
+                    div.innerHTML += `
+                        <div class="card">
+                            <h3>${livro.titulo}</h3>
+                            <p><i>${livro.autor}</i></p>
+                            <div style="margin: 10px 0;">
+                                <span class="badge ${classeBadge}">${textoStatus}</span>
+                                <span class="stars">${estrelas}</span>
+                            </div>
+                            <p style="color: #ddd;">${livro.resenha ? '"' + livro.resenha + '"' : ''}</p>
+                        </div>
+                    `;
+                });
+            });
+    }
+
+
+        const API_INDICACOES = 'http://localhost:8080/indicacoes';
+
+        // Carregar mural ao abrir a página
+        carregarIndicacoes();
+
+        function carregarIndicacoes() {
+            fetch(API_INDICACOES)
+                .then(res => res.json())
+                .then(lista => {
+                    const div = document.getElementById('mural');
+                    div.innerHTML = '';
+
+                    lista.forEach(item => {
+                        // Formata a data (vem como 2026-01-22)
+                        const dataFormatada = new Date(item.dataIndicacao).toLocaleDateString('pt-BR');
+
+                        div.innerHTML += `
+                            <div class="card" style="border-color: #03dac6;">
+                                <h3 style="color: #03dac6;">${item.nomeLivro}</h3>
+                                <p><strong>Indicado por:</strong> ${item.nomeAmigo}</p>
+                                <p><em>"${item.motivo}"</em></p>
+                                <p style="font-size: 0.8em; color: #666; margin-top: 10px; text-align: right;">
+                                    📅 ${dataFormatada}
+                                </p>
+                            </div>
+                        `;
+                    });
+                });
+        }
+
+        function enviarIndicacao() {
+            const nomeAmigo = document.getElementById('nomeAmigo').value;
+            const nomeLivro = document.getElementById('nomeLivroInd').value;
+            const motivo = document.getElementById('motivo').value;
+
+            if(!nomeAmigo || !nomeLivro) {
+                alert("Por favor, preencha seu nome e o nome do livro!");
+                return;
+            }
+
+            const dados = {
+                nomeAmigo: nomeAmigo,
+                nomeLivro: nomeLivro,
+                motivo: motivo
+            };
+
+            fetch(API_INDICACOES, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            })
+            .then(res => res.json())
+            .then(() => {
+                alert("Obrigado pela indicação!");
+                carregarIndicacoes();
+                // Limpar campos
+                document.getElementById('nomeAmigo').value = '';
+                document.getElementById('nomeLivroInd').value = '';
+                document.getElementById('motivo').value = '';
+            });
+        }
+
+
+
+        const dados = {
+            titulo: titulo,
+            autor: autor,
+            status: status,
+            nota: nota ? parseInt(nota) : null, // Se tiver nota, converte pra número
+            resenha: resenha
+        };
+
+        fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        })
+        .then(res => res.json())
+        .then(() => {
+            alert("Livro salvo!");
+            carregarLivros();
+            // Limpar campos
+            document.getElementById('titulo').value = '';
+            document.getElementById('resenha').value = '';
+        });
+    }
+</script>
+</body>
+</html>

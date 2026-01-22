@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Luiz</title>
+    <style>
+        /* --- MESMO ESTILO DO SITE --- */
+        body { background: linear-gradient(to bottom, #240046, #05000a); min-height: 100vh; background-attachment: fixed; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; color: #e0aaff; margin-bottom: 40px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        h2 { border-bottom: 2px solid #9d4edd; padding-bottom: 10px; color: #c77dff; }
+
+        .grid-livros { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background-color: rgba(30, 30, 30, 0.9); padding: 20px; border-radius: 12px; border: 1px solid #3c096c; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card h3 { margin: 0 0 10px 0; color: #fff; }
+        .card p { margin: 5px 0; color: #b0b0b0; font-size: 0.9em; }
+
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
+        .badge-lido { background-color: #2e7d32; color: white; }
+        .badge-lendo { background-color: #ff9100; color: black; }
+        .badge-quero { background-color: #3a0ca3; color: white; }
+        .stars { color: #ffd700; letter-spacing: 2px; }
+
+        /* Formulário de Cadastro (EXCLUSIVO DAQUI) */
+        .form-box { background-color: rgba(44, 44, 44, 0.9); padding: 20px; border-radius: 8px; margin-bottom: 40px; border: 1px solid #5a189a; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #121212; border: 1px solid #5a189a; color: white; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #7b2cbf; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; transition: 0.3s; }
+        button:hover { background-color: #9d4edd; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛠️ Painel do Administrador</h1>
+    <p style="text-align: center; margin-bottom: 30px;"><a href="/" style="color: #03dac6;">Voltar para o Site Público</a></p>
+
+    <div class="form-box">
+        <h2>➕ Adicionar Novo Livro</h2>
+        <input type="text" id="titulo" placeholder="Título do Livro">
+        <input type="text" id="autor" placeholder="Autor">
+
+        <select id="status">
+            <option value="QUERO_LER">Quero Ler</option>
+            <option value="LENDO">Lendo Agora</option>
+            <option value="LIDO">Já Li</option>
+        </select>
+
+        <input type="number" id="nota" placeholder="Nota (1 a 5) - Opcional" min="1" max="5">
+        <textarea id="resenha" placeholder="Minha opinião sobre o livro..." rows="2"></textarea>
+
+        <button onclick="salvarLivro()">Salvar na Estante</button>
+    </div>
+
+    <h2>👀 Conferir Estante</h2>
+    <div id="estante" class="grid-livros"></div>
+</div>
+
+<script>
+    const API = 'http://localhost:8080/livros';
+
+    carregarLivros();
+
+    function carregarLivros() {
+        fetch(API)
+            .then(res => res.json())
+            .then(livros => {
+                const div = document.getElementById('estante');
+                div.innerHTML = '';
+                livros.forEach(livro => {
+                    let classeBadge = 'badge-quero';
+                    let textoStatus = 'Quero Ler';
+                    if(livro.status === 'LIDO') { classeBadge = 'badge-lido'; textoStatus = 'Lido'; }
+                    if(livro.status === 'LENDO') { classeBadge = 'badge-lendo'; textoStatus = 'Lendo'; }
+
+                    let estrelas = '';
+                    if(livro.nota) { estrelas = '★'.repeat(livro.nota) + '☆'.repeat(5 - livro.nota); }
+
+                    div.innerHTML += `
+                        <div class="card">
+                            <h3>${livro.titulo}</h3>
+                            <p><i>${livro.autor}</i></p>
+                            <div style="margin: 10px 0;">
+                                <span class="badge ${classeBadge}">${textoStatus}</span>
+                                <span class="stars">${estrelas}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+    }
+
+    function salvarLivro() {
+        const titulo = document.getElementById('titulo').value;
+        const autor = document.getElementById('autor').value;
+        const status = document.getElementById('status').value;
+        const nota = document.getElementById('nota').value;
+        const resenha = document.getElementById('resenha').value;
+
+        const dados = { titulo, autor, status, nota: nota ? parseInt(nota) : null, resenha };
+
+        fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+    })
+            .then(res => res.json())
+            .then(() => {
+                alert("Livro salvo com sucesso!");
+                carregarLivros();
+                document.getElementById('titulo').value = '';
+                document.getElementById('resenha').value = '';
+            });
+        }
+</script>
+</body>
+</html>
