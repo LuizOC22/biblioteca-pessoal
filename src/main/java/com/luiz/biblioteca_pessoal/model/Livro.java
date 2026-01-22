@@ -24,6 +24,9 @@ public class Livro {
     @Min(1) @Max(5)
     private Integer nota;
 
+    @Column(length = 500)
+    private String capa;
+
     private String resumo;
 
     public Long getId() { return id; }
@@ -41,7 +44,14 @@ public class Livro {
     public Integer getNota() { return nota; }
     public void setNota(Integer nota) { this.nota = nota; }
 
-    public String getResenha() { return resumo; }
-    public void setResenha(String resenha) { this.resumo = resenha; }
+    public String getResumo() { return resumo; }
+    public void setResumo(String resumo) { this.resumo = resumo; }
 
+    public String getCapa() {
+        return capa;
+    }
+
+    public void setCapa(String capa) {
+        this.capa = capa;
+    }
 }

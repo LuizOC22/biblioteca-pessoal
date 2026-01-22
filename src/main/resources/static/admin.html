@@ -57,39 +57,69 @@
 </div>
 
 <script>
+    // --- CONFIGURAÇÕES ---
     const API = 'http://localhost:8080/livros';
 
+    // Carrega a lista assim que a página abre
     carregarLivros();
 
+    // --- FUNÇÃO 1: LISTAR LIVROS (Com Capa e Botão Excluir) ---
     function carregarLivros() {
         fetch(API)
             .then(res => res.json())
             .then(livros => {
                 const div = document.getElementById('estante');
                 div.innerHTML = '';
+
+                if (livros.length === 0) {
+                    div.innerHTML = '<p style="color: #ccc">Nenhum livro cadastrado.</p>';
+                    return;
+                }
+
                 livros.forEach(livro => {
+                    // Cores das Badges
                     let classeBadge = 'badge-quero';
                     let textoStatus = 'Quero Ler';
                     if(livro.status === 'LIDO') { classeBadge = 'badge-lido'; textoStatus = 'Lido'; }
                     if(livro.status === 'LENDO') { classeBadge = 'badge-lendo'; textoStatus = 'Lendo'; }
 
+                    // Estrelas
                     let estrelas = '';
                     if(livro.nota) { estrelas = '★'.repeat(livro.nota) + '☆'.repeat(5 - livro.nota); }
 
+                    // Capa (Com proteção contra erro)
+                    const capaPadrao = 'https://placehold.co/128x190/555/FFF?text=Sem+Capa';
+                    const capaFinal = livro.capa ? livro.capa : capaPadrao;
+
                     div.innerHTML += `
-                        <div class="card">
-                            <h3>${livro.titulo}</h3>
-                            <p><i>${livro.autor}</i></p>
-                            <div style="margin: 10px 0;">
-                                <span class="badge ${classeBadge}">${textoStatus}</span>
-                                <span class="stars">${estrelas}</span>
+                        <div class="card" style="display: flex; gap: 15px; align-items: start;">
+                            <img src="${capaFinal}"
+                                 onerror="this.src='${capaPadrao}'"
+                                 style="width: 80px; height: 120px; object-fit: cover; border-radius: 4px; border: 1px solid #555;">
+
+                            <div style="flex-grow: 1;">
+                                <h3>${livro.titulo}</h3>
+                                <p><i>${livro.autor}</i></p>
+                                <div style="margin: 10px 0;">
+                                    <span class="badge ${classeBadge}">${textoStatus}</span>
+                                    <span class="stars">${estrelas}</span>
+                                </div>
+                                <p style="color: #ddd; font-size: 0.9em; margin-bottom: 15px;">
+                                    ${livro.resenha ? '"' + livro.resenha + '"' : ''}
+                                </p>
+
+                                <button onclick="excluirLivro(${livro.id})" style="background-color: #cf6679; padding: 8px; width: auto; font-size: 0.8em; cursor: pointer; border: none; border-radius: 4px; color: white;">
+                                    🗑️ Excluir
+                                </button>
                             </div>
                         </div>
                     `;
                 });
-            });
+            })
+            .catch(erro => console.error("Erro ao carregar livros:", erro));
     }
 
+    // --- FUNÇÃO 2: SALVAR LIVRO ---
     function salvarLivro() {
         const titulo = document.getElementById('titulo').value;
         const autor = document.getElementById('autor').value;
@@ -97,21 +127,59 @@
         const nota = document.getElementById('nota').value;
         const resenha = document.getElementById('resenha').value;
 
-        const dados = { titulo, autor, status, nota: nota ? parseInt(nota) : null, resenha };
+        if (!titulo || !autor) {
+            alert("Preencha pelo menos Título e Autor!");
+            return;
+        }
+
+        const dados = {
+            titulo: titulo,
+            autor: autor,
+            status: status,
+            nota: nota ? parseInt(nota) : null,
+            resenha: resenha
+        };
 
         fetch(API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)
-    })
-            .then(res => res.json())
-            .then(() => {
-                alert("Livro salvo com sucesso!");
-                carregarLivros();
-                document.getElementById('titulo').value = '';
-                document.getElementById('resenha').value = '';
-            });
+        })
+        .then(res => {
+            if (res.ok) return res.json();
+            throw new Error('Erro ao salvar (Talvez precise logar novamente)');
+        })
+        .then(() => {
+            alert("Livro salvo!");
+            carregarLivros();
+            // Limpa campos
+            document.getElementById('titulo').value = '';
+            document.getElementById('autor').value = '';
+            document.getElementById('resenha').value = '';
+        })
+        .catch(erro => {
+            alert("Erro ao salvar! Veja o console.");
+            console.error(erro);
+        });
+    }
+
+    // --- FUNÇÃO 3: EXCLUIR LIVRO ---
+    function excluirLivro(id) {
+        if (confirm("Tem certeza que quer apagar esse livro?")) {
+            fetch(`${API}/${id}`, {
+                method: 'DELETE'
+            })
+            .then(res => {
+                if (res.ok) {
+                    alert("Livro excluído!");
+                    carregarLivros();
+                } else {
+                    alert("Erro ao excluir. Você está logado?");
+                }
+            })
+            .catch(erro => console.error("Erro ao excluir:", erro));
         }
+    }
 </script>
 </body>
 </html>
