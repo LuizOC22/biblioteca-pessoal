@@ -31,8 +31,17 @@ public class LivroController {
     }
 
     @DeleteMapping("/{id}")
-    public void excluir(@PathVariable Long id){
-        repository.deleteById(id);
+    public void excluir(@PathVariable Long id) {
+        try {
+            System.out.println("Tentando excluir livro ID: " + id);
+            repository.deleteById(id);
+            System.out.println("Livro excluído com sucesso!");
+        } catch (Exception e) {
+            // AQUI ESTÁ O SEGREDOS: Vamos imprimir o erro completo
+            System.out.println("ERRO GRAVE AO DELETAR:");
+            e.printStackTrace(); // Isso imprime aquele texto vermelho gigante
+            throw e; // Devolve o erro 500 pro site (pra não fingir que funcionou)
+        }
     }
 
 }
