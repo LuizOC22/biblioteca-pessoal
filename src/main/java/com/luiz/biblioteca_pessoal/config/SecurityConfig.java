@@ -1,5 +1,6 @@
 package com.luiz.biblioteca_pessoal.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${admin.password}")
+    private String adimnPassword;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -40,7 +44,7 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         UserDetails admin = User.withDefaultPasswordEncoder()
                 .username("luiz")
-                .password("Oliver%12")
+                .password(adimnPassword)
                 .roles("ADMIN")
                 .build();
 
