@@ -3,213 +3,410 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Biblioteca</title>
+    <title>Biblioteca do Luiz</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
     <style>
+        /* --- ESTILO AURORA BOREAL (GLASSMORPHISM ANIMADO) --- */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.08);
+            --accent-color: #00d2ff; /* Azul Ciano Neon */
+            --accent-purple: #bd00ff; /* Roxo Neon */
+            --text-main: #ffffff;
+            --text-secondary: #a0a0a0;
+        }
+
         body {
-
-            background: linear-gradient(to bottom, #240046, #05000a);
-
-            /* Garante que o fundo cubra a tela toda e fique fixo ao rolar */
-            min-height: 100vh;
-            background-attachment: fixed;
-
-            color: #e0e0e0;
-            font-family: 'Segoe UI', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+
+            /* --- O SEGREDO DA AURORA --- */
+            background: linear-gradient(-45deg, #050505, #1a0b2e, #0f1c2e, #000000);
+            background-size: 400% 400%;
+            animation: auroraAnimation 15s ease infinite;
         }
 
-        .container { max-width: 900px; margin: 0 auto; }
+        /* A Animação que move o fundo suavemente */
+        @keyframes auroraAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        /* Títulos com sombra leve para destacar do roxo */
-        h1 { text-align: center; color: #efe9e7; margin-bottom: 40px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        h2 { border-bottom: 2px solid #9d4edd; padding-bottom: 10px; color: #c77dff; }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
 
-        /* Cards de Livros - Um pouco transparentes para fundir com o fundo */
-        .grid-livros { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        /* --- CABEÇALHO --- */
+        header { text-align: center; margin-bottom: 80px; }
 
+        h1 {
+            font-weight: 800;
+            font-size: 3.5rem;
+            letter-spacing: -2px;
+            margin: 0;
+            /* Texto com degradê metálico */
+            background: linear-gradient(135deg, #fff 30%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
+            animation: floatTitle 6s ease-in-out infinite;
+        }
+
+        @keyframes floatTitle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        /* --- TÍTULOS --- */
+        h2 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-top: 80px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        h2::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--glass-border), transparent);
+        }
+
+        h2 i { color: var(--accent-color); filter: drop-shadow(0 0 5px var(--accent-color)); }
+
+        /* --- GRID --- */
+        .grid-livros {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        /* --- CARD DE VIDRO --- */
         .card {
-            background-color: rgba(30, 30, 30, 0.9); /* O 0.9 deixa levemente transparente */
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px); /* Vidro bem embaçado */
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
             padding: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            gap: 20px;
+            align-items: start;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: var(--glass-highlight);
+            border-color: rgba(255,255,255,0.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.02);
+        }
+
+        .card img {
+            width: 90px;
+            height: 135px;
+            object-fit: cover;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-            border: 1px solid #3c096c; /* Borda roxa sutil */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            transition: 0.3s;
         }
-        .card:hover { transform: translateY(-5px); border-color: #7b2cbf; }
 
-        .card h3 { margin: 0 0 10px 0; color: #fff; }
-        .card p { margin: 5px 0; color: #b0b0b0; font-size: 0.9em; }
+        /* Efeito de brilho na imagem ao passar o mouse */
+        .card:hover img { box-shadow: 0 0 15px rgba(255,255,255,0.1); }
 
-        /* Etiquetas */
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
-        .badge-lido { background-color: #2e7d32; color: white; }
-        .badge-lendo { background-color: #ff9100; color: black; }
-        .badge-quero { background-color: #3a0ca3; color: white; }
+        .card-content { flex: 1; }
 
-        .stars { color: #ffd700; letter-spacing: 2px; }
+        .card h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: #fff;
+        }
 
-        /* Formulário */
-        .form-box {
-            background-color: rgba(44, 44, 44, 0.9);
-            padding: 20px;
+        .card p.autor {
+            margin: 0 0 10px 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        /* --- RESUMO --- */
+        .resumo-box {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
             border-radius: 8px;
-            margin-bottom: 40px;
-            border: 1px solid #5a189a;
+            border-left: 2px solid var(--accent-color);
+            font-size: 0.8rem;
+            color: #ddd;
+            font-style: italic;
         }
 
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #121212; border: 1px solid #5a189a; color: white; border-radius: 4px; box-sizing: border-box; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #e0aaff; }
+        /* --- FORMULÁRIO --- */
+        .form-section {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px;
+            margin-top: 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
 
-        button { width: 100%; padding: 12px; background-color: #7b2cbf; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; transition: 0.3s; }
-        button:hover { background-color: #9d4edd; }
+        /* Brilho de fundo no formulário */
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0, 210, 255, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative; z-index: 2;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 18px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+
+        textarea { grid-column: 1 / -1; resize: none; }
+
+        input:focus, textarea:focus {
+            outline: none;
+            background: rgba(255,255,255,0.05);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+        }
+
+        button.btn-enviar {
+            background: linear-gradient(135deg, var(--accent-color), #0072ff);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            position: relative; z-index: 2;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+        }
+
+        button.btn-enviar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.6);
+        }
+
+        /* --- BADGES --- */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-quero { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .badge-lendo { background: rgba(255, 165, 0, 0.15); color: #ffae00; border: 1px solid rgba(255, 165, 0, 0.3); }
+        .badge-lido { background: rgba(0, 255, 127, 0.1); color: #00ff7f; border: 1px solid rgba(0, 255, 127, 0.3); }
+
+        .stars { color: #ffd700; font-size: 0.8rem; display: block; margin-top: 5px; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+        }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>📚 Biblioteca do Luiz</h1>
+    <header>
+        <h1>Biblioteca do Luiz</h1>
+        <div class="subtitle">Curadoria Pessoal & Indicações</div>
+    </header>
 
-
-
-    <h2>📖 Minha Estante</h2>
+    <h2><i class="bi bi-bookmarks-fill"></i> Minha Estante</h2>
     <div id="estante" class="grid-livros">
+        <p style="color: #666">Carregando...</p>
     </div>
 
+    <div class="form-section">
+        <h2 style="justify-content: center; margin-top: 0; text-shadow:none;"><i class="bi bi-lightbulb-fill"></i> Indique um Livro</h2>
+        <p style="color: #aaa; margin-bottom: 30px;">Tem uma recomendação valiosa? Mande pra mim. Ela aparecerá no mural abaixo.</p>
+
+        <div class="form-grid">
+            <input type="text" id="nomeAmigo" placeholder="Seu Nome">
+            <input type="text" id="nomeLivroInd" placeholder="Nome do Livro">
+            <textarea id="motivo" rows="3" placeholder="Por que devo ler este livro?"></textarea>
+        </div>
+
+        <button onclick="enviarIndicacao()" class="btn-enviar">Enviar Sugestão</button>
+    </div>
+
+    <h2><i class="bi bi-chat-square-heart-fill"></i> Mural dos Amigos</h2>
+    <div id="mural" class="grid-livros">
+    </div>
 </div>
-
-</div>
-
-<hr style="border-color: #7b2cbf; margin: 50px 0; opacity: 0.3;">
-
-<div class="form-box" style="border-color: #03dac6;">
-    <h2 style="color: #03dac6; border-color: #018786;">💡 Indique um Livro para mim</h2>
-
-    <input type="text" id="nomeAmigo" placeholder="Seu Nome (Visitante)">
-    <input type="text" id="nomeLivroInd" placeholder="Nome do Livro">
-    <textarea id="motivo" placeholder="Por que eu devo ler este livro?" rows="2"></textarea>
-
-    <button onclick="enviarIndicacao()" style="background-color: #03dac6; color: black;">Enviar Sugestão</button>
-</div>
-
-<h2 style="color: #03dac6; border-color: #03dac6;">💬 Mural dos Amigos</h2>
-<div id="mural" class="grid-livros">
-</div>
-
 
 <script>
-    // --- CONFIGURAÇÕES ---
     const API_LIVROS = '/livros';
-    const API_INDICACOES = '/indicacoes';
 
-    // --- INICIALIZAÇÃO ---
     carregarLivros();
-    carregarIndicacoes();
 
-    // --- FUNÇÃO 1: BUSCAR MEUS LIVROS (Vitrine) ---
     function carregarLivros() {
         fetch(API_LIVROS)
             .then(res => res.json())
             .then(livros => {
-                const div = document.getElementById('estante');
+                const divEstante = document.getElementById('estante');
+                const divMural = document.getElementById('mural');
 
-                if (!div) return; // Se não achar a div, para aqui
-
-                div.innerHTML = ''; // Limpa antes de preencher
+                if (divEstante) divEstante.innerHTML = '';
+                if (divMural) divMural.innerHTML = '';
 
                 if (livros.length === 0) {
-                    div.innerHTML = '<p style="color: #ccc; text-align: center;">Nenhum livro na estante ainda.</p>';
+                    divEstante.innerHTML = '<p style="color: #ccc;">Nenhum livro encontrado.</p>';
                     return;
                 }
 
                 livros.forEach(livro => {
+                    // TRIAGEM:
+                    const ehIndicacao = livro.autor && livro.autor.includes("Indicado por");
+                    const destino = ehIndicacao ? divMural : divEstante;
+
+                    // STATUS:
                     let classeBadge = 'badge-quero';
                     let textoStatus = 'Quero Ler';
-                    if(livro.status === 'LIDO') { classeBadge = 'badge-lido'; textoStatus = 'Lido'; }
-                    if(livro.status === 'LENDO') { classeBadge = 'badge-lendo'; textoStatus = 'Lendo'; }
 
+                    if (ehIndicacao) {
+                        classeBadge = 'badge-lendo'; textoStatus = 'Indicação';
+                    } else if (livro.status === 'LIDO') {
+                        classeBadge = 'badge-lido'; textoStatus = 'Lido';
+                    } else if (livro.status === 'LENDO') {
+                        classeBadge = 'badge-lendo'; textoStatus = 'Lendo';
+                    }
+
+                    // ESTRELAS:
                     let estrelas = '';
                     if(livro.nota) { estrelas = '★'.repeat(livro.nota) + '☆'.repeat(5 - livro.nota); }
 
-                    const capaPadrao = 'https://placehold.co/128x190/555/FFF?text=Sem+Capa';
+                    // CAPA:
+                    const capaPadrao = 'https://placehold.co/128x190/1a1a2e/FFF?text=Sem+Capa';
+                    const capaFinal = livro.capa ? livro.capa : capaPadrao;
 
-                        // 2. Tenta usar a capa do banco. Se for nula, usa a padrão.
-                        const capaFinal = livro.capa ? livro.capa : capaPadrao;
+                    // RESUMO:
+                    const resumoTexto = livro.resumo || '';
+                    const resumoHtml = resumoTexto ? `<div class="resumo-box">"${resumoTexto}"</div>` : '';
 
-                        div.innerHTML += `
-                            <div class="card" style="display: flex; gap: 15px; align-items: start;">
-                                <img src="${capaFinal}"
-                                     onerror="this.src='${capaPadrao}'"
-                                     style="width: 80px; height: 120px; object-fit: cover; border-radius: 4px; border: 1px solid #555;">
+                    // CARD:
+                    const cardHtml = `
+                        <div class="card">
+                            <img src="${capaFinal}" onerror="this.src='${capaPadrao}'">
+                            <div class="card-content">
+                                <h3>${livro.titulo}</h3>
+                                <p class="autor">${livro.autor}</p>
 
                                 <div>
-                                    <h3>${livro.titulo}</h3>
-                                    <p><i>${livro.autor}</i></p>
-                                    <div style="margin: 10px 0;">
-                                        <span class="badge ${classeBadge}">${textoStatus}</span>
-                                        <span class="stars">${estrelas}</span>
-                                    </div>
-                                    <p style="color: #ddd; font-size: 0.9em;">${livro.resenha ? '"' + livro.resenha + '"' : ''}</p>
+                                    <span class="badge ${classeBadge}">${textoStatus}</span>
+                                    <span class="stars">${estrelas}</span>
+                                </div>
 
-                                    </div>
+                                ${resumoHtml}
                             </div>
-                        `;
+                        </div>
+                    `;
+                    destino.innerHTML += cardHtml;
                 });
             })
-            .catch(erro => console.error("Erro ao buscar livros:", erro));
+            .catch(erro => console.error("Erro:", erro));
     }
 
-    // --- FUNÇÃO 2: BUSCAR INDICAÇÕES (Mural) ---
-    function carregarIndicacoes() {
-        fetch(API_INDICACOES)
-            .then(res => res.json())
-            .then(lista => {
-                const div = document.getElementById('mural');
-                if(div) {
-                    div.innerHTML = '';
-                    lista.forEach(item => {
-                        const dataFormatada = new Date(item.dataIndicacao).toLocaleDateString('pt-BR');
-                        div.innerHTML += `
-                            <div class="card" style="border-color: #03dac6;">
-                                <h3 style="color: #03dac6;">${item.nomeLivro}</h3>
-                                <p><strong>Indicado por:</strong> ${item.nomeAmigo}</p>
-                                <p><em>"${item.motivo}"</em></p>
-                                <p style="font-size: 0.8em; color: #666; margin-top: 10px; text-align: right;">
-                                    📅 ${dataFormatada}
-                                </p>
-                            </div>
-                        `;
-                    });
-                }
-            });
-    }
-
-    // --- FUNÇÃO 3: ENVIAR INDICAÇÃO ---
     function enviarIndicacao() {
         const nomeAmigo = document.getElementById('nomeAmigo').value;
         const nomeLivro = document.getElementById('nomeLivroInd').value;
         const motivo = document.getElementById('motivo').value;
 
         if(!nomeAmigo || !nomeLivro) {
-            alert("Por favor, preencha seu nome e o nome do livro!");
+            alert("Por favor, preencha nome e livro!");
             return;
         }
 
-        const dados = { nomeAmigo, nomeLivro, motivo };
+        const dadosParaOJava = {
+            titulo: nomeLivro,
+            autor: "Indicado por: " + nomeAmigo,
+            resumo: motivo,
+            capa: ""
+        };
 
-        fetch(API_INDICACOES, {
+        fetch(API_LIVROS, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dados)
+            body: JSON.stringify(dadosParaOJava)
         })
-        .then(res => res.json())
-        .then(() => {
-            alert("Obrigado pela indicação!");
-            carregarIndicacoes();
-            document.getElementById('nomeAmigo').value = '';
-            document.getElementById('nomeLivroInd').value = '';
-            document.getElementById('motivo').value = '';
-        });
+        .then(res => {
+            if(res.ok) {
+                alert("Indicação enviada com sucesso!");
+                carregarLivros();
+                document.getElementById('nomeAmigo').value = '';
+                document.getElementById('nomeLivroInd').value = '';
+                document.getElementById('motivo').value = '';
+            } else {
+                alert("Erro ao enviar. Tente novamente.");
+            }
+        })
+        .catch(err => console.error(err));
     }
 </script>
 </body>

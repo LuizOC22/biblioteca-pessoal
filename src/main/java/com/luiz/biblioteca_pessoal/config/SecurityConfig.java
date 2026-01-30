@@ -24,19 +24,27 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // 1. LIBERADO GERAL (Arquivos do site e Vitrine)
+                        .requestMatchers("/", "/index.html", "/style.css", "/script.js", "/images/**").permitAll()
 
-                        .requestMatchers("/", "/index.html", "/style.css").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/livros").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/indicacoes").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/indicacoes").permitAll()
+                        // 2. API PÚBLICA (Vitrine e Indicação)
+                        .requestMatchers(HttpMethod.GET, "/livros").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/livros").permitAll()
 
+                        // 3. ÁREA RESTRITA (Admin)
+                        .requestMatchers("/admin.html").authenticated()          // Só você entra na Batcaverna
+                        .requestMatchers(HttpMethod.PUT, "/livros/**").authenticated()    // Só você edita
+                        .requestMatchers(HttpMethod.DELETE, "/livros/**").authenticated() // Só você deleta
+
+                        // 4. O RESTO BLOQUEIA
                         .anyRequest().authenticated()
-                    )
+                )
                 .formLogin(form -> form
-                                .defaultSuccessUrl("/admin.html", true)
-                                .permitAll()
-                        )
-                .httpBasic(basic -> {});
+                        .permitAll()
+                        .defaultSuccessUrl("/admin.html", true)
+                )
+                .logout(logout -> logout.permitAll());
+
         return http.build();
     }
 

@@ -24,7 +24,7 @@ public class Livro {
     @Min(1) @Max(5)
     private Integer nota;
 
-    @Column(length = 500)
+    @Column(length = 2048)
     private String capa;
 
     private String resumo;
@@ -54,4 +54,6 @@ public class Livro {
     public void setCapa(String capa) {
         this.capa = capa;
     }
+
+
 }

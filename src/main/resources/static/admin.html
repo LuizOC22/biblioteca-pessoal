@@ -1,185 +1,425 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo - Luiz</title>
+    <title>BAT_COMPUTER // ARCHIVE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- MESMO ESTILO DO SITE --- */
-        body { background: linear-gradient(to bottom, #240046, #05000a); min-height: 100vh; background-attachment: fixed; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { text-align: center; color: #e0aaff; margin-bottom: 40px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        h2 { border-bottom: 2px solid #9d4edd; padding-bottom: 10px; color: #c77dff; }
+        /* --- ESTILO BAT-CAVERNA --- */
+        :root {
+            --bg-dark: #020202;
+            --panel-bg: #0a0a0a;
+            --neon-blue: #00f3ff; /* Azul Ciano Laser */
+            --text-dim: #4a4a4a;
+            --border-tech: #1f1f1f;
+        }
 
-        .grid-livros { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .card { background-color: rgba(30, 30, 30, 0.9); padding: 20px; border-radius: 12px; border: 1px solid #3c096c; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .card h3 { margin: 0 0 10px 0; color: #fff; }
-        .card p { margin: 5px 0; color: #b0b0b0; font-size: 0.9em; }
+        body {
+            background-color: var(--bg-dark);
+            color: #ccc;
+            font-family: 'Chakra Petch', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+        }
 
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
-        .badge-lido { background-color: #2e7d32; color: white; }
-        .badge-lendo { background-color: #ff9100; color: black; }
-        .badge-quero { background-color: #3a0ca3; color: white; }
-        .stars { color: #ffd700; letter-spacing: 2px; }
+        /* Scanlines (Efeito Monitor Antigo) */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
 
-        /* Formulário de Cadastro (EXCLUSIVO DAQUI) */
-        .form-box { background-color: rgba(44, 44, 44, 0.9); padding: 20px; border-radius: 8px; margin-bottom: 40px; border: 1px solid #5a189a; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #121212; border: 1px solid #5a189a; color: white; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #7b2cbf; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; transition: 0.3s; }
-        button:hover { background-color: #9d4edd; }
+        /* Sidebar */
+        .sidebar {
+            width: 80px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border-tech);
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 2rem;
+            z-index: 100;
+            transition: width 0.3s;
+        }
+        .sidebar:hover { width: 200px; }
+
+        .nav-item {
+            width: 100%; display: flex; align-items: center; padding: 15px 0;
+            color: var(--text-dim); text-decoration: none; transition: 0.2s; cursor: pointer;
+            white-space: nowrap; overflow: hidden;
+        }
+        .nav-item i { font-size: 1.5rem; min-width: 80px; text-align: center; }
+        .nav-text { opacity: 0; transition: opacity 0.2s; font-weight: 600; text-transform: uppercase; }
+        .sidebar:hover .nav-text { opacity: 1; }
+        .nav-item:hover, .nav-item.active {
+            color: var(--neon-blue); border-left: 3px solid var(--neon-blue);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        /* Main Content */
+        .main-content { margin-left: 80px; width: 100%; padding: 2rem 4rem; }
+
+        /* Search Bar */
+        .search-container {
+            border-bottom: 2px solid var(--border-tech); padding-bottom: 10px; margin-bottom: 40px; display: flex; align-items: center;
+        }
+        .search-prefix { color: var(--neon-blue); margin-right: 10px; font-weight: bold; animation: blink 1s infinite; }
+        .search-input { background: transparent; border: none; color: white; font-family: 'Chakra Petch', monospace; font-size: 1.5rem; width: 100%; text-transform: uppercase; outline: none; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Cards */
+        .tech-card {
+            background: linear-gradient(135deg, #0e0e0e 0%, #050505 100%);
+            border: 1px solid var(--border-tech);
+            display: flex; height: 160px; position: relative; overflow: hidden;
+            animation: slideIn 0.5s ease-out forwards; opacity: 0;
+            transition: all 0.3s;
+        }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .tech-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); }
+
+        .tech-img-box { width: 120px; position: relative; background: #111; display: flex; align-items: center; justify-content: center; }
+        .tech-img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(80%); transition: filter 0.3s; }
+        .tech-card:hover .tech-img { filter: grayscale(0%); }
+
+        .tech-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .tech-title { font-size: 1.4rem; font-weight: 700; margin: 0; color: #fff; }
+        .tech-author { color: var(--text-dim); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
+        .tech-status { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; color: var(--neon-blue); border: 1px solid var(--neon-blue); padding: 2px 5px; }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🛠️ Painel do Administrador</h1>
-    <p style="text-align: center; margin-bottom: 30px;"><a href="/" style="color: #03dac6;">Voltar para o Site Público</a></p>
+<nav class="sidebar">
+    <div class="mb-5 text-white"><i class="bi bi-cpu-fill fs-3"></i></div>
+    <a href="#" class="nav-item active"><i class="bi bi-grid-3x3"></i><span class="nav-text">Database</span></a>
+    <a href="#" class="nav-item" data-bs-toggle="modal" data-bs-target="#modalAdicionar">
+        <i class="bi bi-plus-square"></i>
+        <span class="nav-text">Inject Data</span>
+    </a>
+    <div class="mt-auto mb-4"><i class="bi bi-power text-danger"></i></div>
+</nav>
 
-    <div class="form-box">
-        <h2>➕ Adicionar Novo Livro</h2>
-        <input type="text" id="titulo" placeholder="Título do Livro">
-        <input type="text" id="autor" placeholder="Autor">
-
-        <select id="status">
-            <option value="QUERO_LER">Quero Ler</option>
-            <option value="LENDO">Lendo Agora</option>
-            <option value="LIDO">Já Li</option>
-        </select>
-
-        <input type="number" id="nota" placeholder="Nota (1 a 5) - Opcional" min="1" max="5">
-        <textarea id="resenha" placeholder="Minha opinião sobre o livro..." rows="2"></textarea>
-
-        <button onclick="salvarLivro()">Salvar na Estante</button>
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-end mb-2">
+        <h6 class="text-uppercase text-muted m-0" style="letter-spacing: 3px;">System // Library_Core</h6>
+        <div class="text-end text-muted small">STATUS: <span style="color: var(--neon-blue)">ONLINE</span><br>USER: ADMIN_LUIZ</div>
     </div>
 
-    <h2>👀 Conferir Estante</h2>
-    <div id="estante" class="grid-livros"></div>
+    <div class="search-container">
+        <span class="search-prefix">>_</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="SEARCH DATABASE..." autofocus>
+    </div>
+
+    <div class="row g-4" id="livros-grid">
+        <div class="text-center text-muted mt-5">ACCESSING DATABASE...</div>
+    </div>
 </div>
 
 <script>
-    // --- CONFIGURAÇÕES ---
-    const API = '/livros';
+    const API_URL = '/livros';
+    const grid = document.getElementById('livros-grid');
 
-    // Carrega a lista assim que a página abre
-    carregarLivros();
-
-    // --- FUNÇÃO 1: LISTAR LIVROS (Com Capa e Botão Excluir) ---
-    function carregarLivros() {
-        fetch(API)
-            .then(res => res.json())
-            .then(livros => {
-                const div = document.getElementById('estante');
-                div.innerHTML = '';
-
-                if (livros.length === 0) {
-                    div.innerHTML = '<p style="color: #ccc">Nenhum livro cadastrado.</p>';
-                    return;
-                }
-
-                livros.forEach(livro => {
-                    // Cores das Badges
-                    let classeBadge = 'badge-quero';
-                    let textoStatus = 'Quero Ler';
-                    if(livro.status === 'LIDO') { classeBadge = 'badge-lido'; textoStatus = 'Lido'; }
-                    if(livro.status === 'LENDO') { classeBadge = 'badge-lendo'; textoStatus = 'Lendo'; }
-
-                    // Estrelas
-                    let estrelas = '';
-                    if(livro.nota) { estrelas = '★'.repeat(livro.nota) + '☆'.repeat(5 - livro.nota); }
-
-                    // Capa (Com proteção contra erro)
-                    const capaPadrao = 'https://placehold.co/128x190/555/FFF?text=Sem+Capa';
-                    const capaFinal = livro.capa ? livro.capa : capaPadrao;
-
-                    div.innerHTML += `
-                        <div class="card" style="display: flex; gap: 15px; align-items: start;">
-                            <img src="${capaFinal}"
-                                 onerror="this.src='${capaPadrao}'"
-                                 style="width: 80px; height: 120px; object-fit: cover; border-radius: 4px; border: 1px solid #555;">
-
-                            <div style="flex-grow: 1;">
-                                <h3>${livro.titulo}</h3>
-                                <p><i>${livro.autor}</i></p>
-                                <div style="margin: 10px 0;">
-                                    <span class="badge ${classeBadge}">${textoStatus}</span>
-                                    <span class="stars">${estrelas}</span>
-                                </div>
-                                <p style="color: #ddd; font-size: 0.9em; margin-bottom: 15px;">
-                                    ${livro.resenha ? '"' + livro.resenha + '"' : ''}
-                                </p>
-
-                                <button onclick="excluirLivro(${livro.id})" style="background-color: #cf6679; padding: 8px; width: auto; font-size: 0.8em; cursor: pointer; border: none; border-radius: 4px; color: white;">
-                                    🗑️ Excluir
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-            })
-            .catch(erro => console.error("Erro ao carregar livros:", erro));
+    // --- 1. CARREGAR LIVROS ---
+    async function carregarLivros() {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('Falha na conexão');
+            const livros = await response.json();
+            renderizarLivros(livros);
+        } catch (error) {
+            console.error("Erro:", error);
+            grid.innerHTML = '<div class="text-danger text-center">SYSTEM ERROR: CONNECTION FAILED</div>';
+        }
     }
 
-    // --- FUNÇÃO 2: SALVAR LIVRO ---
-    function salvarLivro() {
-        const titulo = document.getElementById('titulo').value;
-        const autor = document.getElementById('autor').value;
-        const status = document.getElementById('status').value;
-        const nota = document.getElementById('nota').value;
-        const resenha = document.getElementById('resenha').value;
+    // --- 2. RENDERIZAR NA TELA ---
+    function renderizarLivros(listaLivros) {
+        grid.innerHTML = '';
 
-        if (!titulo || !autor) {
-            alert("Preencha pelo menos Título e Autor!");
+        if (listaLivros.length === 0) {
+            grid.innerHTML = '<div class="text-muted text-center">DATABASE EMPTY</div>';
             return;
         }
 
-        const dados = {
-            titulo: titulo,
-            autor: autor,
-            status: status,
-            nota: nota ? parseInt(nota) : null,
-            resenha: resenha
-        };
+        listaLivros.forEach((livro, index) => {
+            const imagemUrl = livro.capa || 'https://via.placeholder.com/150/111111/333333?text=NO+IMG';
 
-        fetch(API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dados)
-        })
-        .then(res => {
-            if (res.ok) return res.json();
-            throw new Error('Erro ao salvar (Talvez precise logar novamente)');
-        })
-        .then(() => {
-            alert("Livro salvo!");
-            carregarLivros();
-            // Limpa campos
-            document.getElementById('titulo').value = '';
-            document.getElementById('autor').value = '';
-            document.getElementById('resenha').value = '';
-        })
-        .catch(erro => {
-            alert("Erro ao salvar! Veja o console.");
-            console.error(erro);
+            // NOTA: O botão EDIT agora está blindado com || '' para não quebrar se a capa for nula
+            const cardHtml = `
+                <div class="col-12 col-xl-6" style="animation-delay: ${index * 0.1}s">
+                    <div class="tech-card">
+                        <span class="tech-status">SECURE</span>
+                        <div class="tech-img-box">
+                            <img src="${imagemUrl}" class="tech-img">
+                        </div>
+                        <div class="tech-info">
+                            <h3 class="tech-title">${livro.titulo}</h3>
+                            <span class="tech-author">${livro.autor}</span>
+                            <div class="mt-3">
+                                <button onclick="abrirEdicao('${livro.id}', '${livro.titulo}', '${livro.autor}', '${livro.capa || ''}')"
+                                        class="btn btn-sm btn-outline-warning text-warning border-warning rounded-0">
+                                    EDIT
+                                </button>
+                                <button onclick="deletarLivro(${livro.id})" class="btn btn-sm btn-outline-danger rounded-0 ms-2">
+                                    PURGE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += cardHtml;
         });
     }
 
-    // --- FUNÇÃO 3: EXCLUIR LIVRO ---
-    function excluirLivro(id) {
-        if (confirm("Tem certeza que quer apagar esse livro?")) {
-            fetch(`${API}/${id}`, {
-                method: 'DELETE'
-            })
-            .then(res => {
-                if (res.ok) {
-                    alert("Livro excluído!");
-                    carregarLivros();
-                } else {
-                    alert("Erro ao excluir. Você está logado?");
-                }
-            })
-            .catch(erro => console.error("Erro ao excluir:", erro));
-        }
+    // --- 3. DELETAR (PURGE) ---
+    async function deletarLivro(id) {
+        if(!confirm("CONFIRM DELETION of Data Block ID: " + id + "?")) return;
+        try {
+            await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            carregarLivros();
+        } catch (error) { console.error(error); alert("SYSTEM ERROR"); }
     }
+
+    // --- 4. SALVAR NOVO (INJECT) ---
+    async function salvarLivro() {
+        const titulo = document.getElementById('novoTitulo').value;
+        const autor = document.getElementById('novoAutor').value;
+        const capa = document.getElementById('novaImagem').value;
+
+        if (!titulo || !autor) { alert("ERROR: MISSING DATA FIELDS"); return; }
+
+        const livroData = { titulo: titulo, autor: autor, capa: capa };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(livroData)
+            });
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('modalAdicionar')).hide();
+                document.getElementById('formAdicionar').reset();
+                carregarLivros();
+            } else { alert("UPLOAD FAILED"); }
+        } catch (error) { console.error(error); }
+    }
+
+    // --- 5. AUTO-SCAN (GOOGLE BOOKS) ---
+    async function buscarCapaAutomatica() {
+        const termo = document.getElementById('novoTitulo').value;
+        const statusText = document.getElementById('statusScan');
+        const imagemInput = document.getElementById('novaImagem');
+
+        if (!termo) { alert("TITLE REQUIRED"); return; }
+        statusText.innerText = "SCANNING...";
+
+        try {
+            const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(termo)}`);
+            const data = await res.json();
+            if (data.items && data.items.length > 0) {
+                let url = data.items[0].volumeInfo.imageLinks?.thumbnail;
+                if(url) {
+                    imagemInput.value = url.replace('http://', 'https://');
+                    statusText.innerText = "TARGET ACQUIRED";
+                    statusText.style.color = "#00ff00";
+                } else { statusText.innerText = "NO IMAGE FOUND"; }
+            } else { statusText.innerText = "NO MATCH"; }
+        } catch (e) { statusText.innerText = "ERROR"; }
+    }
+
+    // --- 6. ABRIR EDIÇÃO (O QUE ESTAVA FALTANDO) ---
+    function abrirEdicao(id, titulo, autor, capa) {
+        document.getElementById('editId').value = id;
+        document.getElementById('editTitulo').value = titulo;
+        document.getElementById('editAutor').value = autor;
+        document.getElementById('editCapa').value = capa;
+
+        const modal = new bootstrap.Modal(document.getElementById('modalEditar'));
+        modal.show();
+    }
+
+    // --- 7. CONFIRMAR EDIÇÃO (PUT) ---
+    async function confirmarEdicao() {
+        const id = document.getElementById('editId').value;
+        const dados = {
+            titulo: document.getElementById('editTitulo').value,
+            autor: document.getElementById('editAutor').value,
+            capa: document.getElementById('editCapa').value
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide();
+                carregarLivros();
+            } else { alert("UPDATE FAILED"); }
+        } catch (e) { console.error(e); }
+    }
+
+    // --- 8. FILTRO DE PESQUISA ---
+    document.getElementById('searchInput').addEventListener('keyup', (e) => {
+        const termo = e.target.value.toLowerCase();
+        document.querySelectorAll('.col-12').forEach(card => {
+            card.style.display = card.innerText.toLowerCase().includes(termo) ? 'block' : 'none';
+        });
+    });
+
+    // INICIALIZAÇÃO
+    carregarLivros();
+
+    // --- 9. AUTO-SCAN PARA A EDIÇÃO (NOVA FUNÇÃO) ---
+async function buscarCapaEdicao() {
+    // Pegamos os IDs da janela de EDIÇÃO
+    const termo = document.getElementById('editTitulo').value;
+    const statusText = document.getElementById('statusScanEdit');
+    const imagemInput = document.getElementById('editCapa');
+
+    if (!termo) {
+        alert("TITLE REQUIRED FOR SCAN");
+        return;
+    }
+
+    statusText.innerText = "SCANNING GLOBAL DATABASE...";
+    statusText.style.color = "var(--neon-blue)";
+
+    try {
+        // Busca no Google Books
+        const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(termo)}`);
+        const data = await res.json();
+
+        if (data.items && data.items.length > 0) {
+            // Pega a primeira imagem que achar
+            let url = data.items[0].volumeInfo.imageLinks?.thumbnail;
+
+            if(url) {
+                // Força HTTPS e joga no input
+                imagemInput.value = url.replace('http://', 'https://');
+                statusText.innerText = "TARGET ACQUIRED";
+                statusText.style.color = "#00ff00"; // Verde
+            } else {
+                statusText.innerText = "DATA FOUND BUT NO IMAGE";
+                statusText.style.color = "orange";
+            }
+        } else {
+            statusText.innerText = "NO MATCH FOUND";
+            statusText.style.color = "red";
+        }
+    } catch (e) {
+        console.error(e);
+        statusText.innerText = "CONNECTION ERROR";
+        statusText.style.color = "red";
+    }
+}
+
 </script>
+
+<div class="modal fade" id="modalAdicionar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #0e0e0e; border: 1px solid var(--neon-blue); color: #fff;">
+            <div class="modal-header" style="border-bottom: 1px solid #333;">
+                <h5 class="modal-title" style="font-family: 'Chakra Petch'; letter-spacing: 2px;">
+                    > INJECT_NEW_DATA
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAdicionar">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">DATA: TITLE</label>
+                        <input type="text" id="novoTitulo" class="form-control bg-dark text-white border-secondary rounded-0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">DATA: AUTHOR</label>
+                        <input type="text" id="novoAutor" class="form-control bg-dark text-white border-secondary rounded-0" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">DATA: IMAGE_URL</label>
+                            <div class="input-group">
+                                <input type="text" id="novaCapa" class="form-control bg-dark text-white border-secondary rounded-0" placeholder="Waiting for data...">
+
+                                <button type="button" onclick="buscarCapaAutomatica()" class="btn btn-outline-info rounded-0">
+                                    <i class="bi bi-search"></i> AUTO-SCAN
+                                </button>
+                            </div>
+                            <div id="statusScan" class="form-text text-muted small" style="height: 20px;"></div>
+                        </div>
+                        <input type="text" id="novaImagem" class="form-control bg-dark text-white border-secondary rounded-0" placeholder="http://...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #333;">
+                <button type="button" class="btn btn-outline-secondary rounded-0 btn-sm" data-bs-dismiss="modal">CANCEL</button>
+                <button type="button" onclick="salvarLivro()" class="btn btn-outline-info rounded-0 btn-sm">
+                    <i class="bi bi-save me-1"></i> UPLOAD TO CORE
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #0e0e0e; border: 1px solid var(--neon-blue); color: #fff;">
+            <div class="modal-header" style="border-bottom: 1px solid #333;">
+                <h5 class="modal-title">> EDIT_DATA_BLOCK</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditar">
+                    <input type="hidden" id="editId">
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">DATA: TITLE</label>
+                        <input type="text" id="editTitulo" class="form-control bg-dark text-white border-secondary rounded-0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">DATA: AUTHOR</label>
+                        <input type="text" id="editAutor" class="form-control bg-dark text-white border-secondary rounded-0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">DATA: IMAGE_URL</label>
+                        <div class="input-group">
+                            <input type="text" id="editCapa" class="form-control bg-dark text-white border-secondary rounded-0">
+
+                            <button type="button" onclick="buscarCapaEdicao()" class="btn btn-outline-warning rounded-0">
+                                <i class="bi bi-search"></i> AUTO-SCAN
+                            </button>
+                        </div>
+                        <div id="statusScanEdit" class="form-text text-muted small" style="height: 20px;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #333;">
+                <button type="button" class="btn btn-outline-secondary rounded-0 btn-sm" data-bs-dismiss="modal">CANCEL</button>
+                <button type="button" onclick="confirmarEdicao()" class="btn btn-outline-warning rounded-0 btn-sm">
+                    <i class="bi bi-pencil-square me-1"></i> OVERWRITE DATA
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
