@@ -4,5 +4,6 @@ public enum StatusLeitura {
 
     QUERO_LER,
     LENDO,
-    LIDO
+    LIDO,
+    PENDENTE
 }
